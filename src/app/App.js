@@ -1,22 +1,39 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import HttpService from '../services/http-service';
 
+// components
+import Product from '../product/product';
+import Wishlist from '../wishlist/wishlist';
+
+// services
+import HttpService from '../services/http-service';
 const http = new HttpService();
 
 class App extends Component {
 
   constructor(props) {
     super(props);
+    this.state = {products: []};
     this.loadData = this.loadData.bind(this);
+    this.productList = this.productList.bind(this);
     this.loadData();
   }
 
   loadData = () => {
-    http.getProducts().then(products => {
-      console.log(products);
+    var self = this;
+    http.getProducts().then(data => {
+      self.setState({products: data})
     })
+  }
+
+  productList = () => {
+    const list = this.state.products.map((product) => 
+      <div className="list" key={product._id}>
+        <Product title={product.title} price={product.price} imgUrl={product.imgUrl} />
+      </div>
+    );
+    return (list);
   }
 
   render() {
@@ -26,9 +43,10 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to React</h1>
         </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+        <div className="App-main">
+          {this.productList()}
+          <Wishlist />
+        </div>
       </div>
     );
   }
